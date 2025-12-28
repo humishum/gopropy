@@ -1,0 +1,70 @@
+[project]
+name = "gopropy"
+version = "0.1.0"
+description = "Python library for extracting and analyzing GoPro telemetry data (GPMF format)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Humdaan Mustafa", email = ""}
+]
+maintainers = [
+    {name = "Humdaan Mustafa", email = ""}
+]
+keywords = ["gopro", "gpmf", "telemetry", "metadata", "video", "sensor", "gps", "accelerometer", "gyroscope"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "ffmpeg-python>=0.2.0",
+    "ruff>=0.14.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/humishum/gopropy"
+Documentation = "https://github.com/humishum/gopropy#readme"
+Repository = "https://github.com/humishum/gopropy"
+Issues = "https://github.com/humishum/gopropy/issues"
+Changelog = "https://github.com/humishum/gopropy/releases"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "ipykernel>=6.29.0",
+]
+visualization = [
+    "rerun-sdk>=0.15.0",
+    "opencv-python>=4.8.0",
+    "matplotlib>=3.8.0",
+]
+hdf5 = [
+    "h5py>=3.8.0",
+]
+all = [
+    "h5py>=3.8.0",
+    "rerun-sdk>=0.15.0",
+    "opencv-python>=4.8.0",
+    "matplotlib>=3.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gopropy"]

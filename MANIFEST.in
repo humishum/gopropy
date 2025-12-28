@@ -1,0 +1,20 @@
+# Include documentation and metadata
+include README.md
+include LICENSE
+include CHANGELOG.md
+
+# Include model documentation
+recursive-include docs *.md
+
+# Exclude development files
+exclude sandbox.ipynb
+exclude test_*.py
+exclude validate_*.py
+exclude investigate_*.py
+exclude *_SUMMARY.md
+
+# Exclude build artifacts
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
+

@@ -1,0 +1,45 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.env
+venv/
+ENV/
+
+# Test data and outputs
+data/
+output/
+test_output/
+*.mp4
+*.MP4
+
+# Development files
+*.ipynb_checkpoints/
+.ipynb_checkpoints/
+sandbox.ipynb
+test_*.py
+validate_*.py
+investigate_*.py
+*_SUMMARY.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
