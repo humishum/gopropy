@@ -240,14 +240,6 @@ with h5py.File("telemetry.h5", 'r') as f:
 
 **Best for:** Large datasets, MATLAB/scientific computing, hierarchical data
 
-### Export Format Comparison
-
-| Format | Size | Speed | Human-Readable | Python-Friendly | Multi-Language |
-|--------|------|-------|----------------|-----------------|----------------|
-| CSV | 4.37 MB | Fast | ✅ Yes | ⚠️ OK | ✅ Yes |
-| JSON | 7.80 MB | Medium | ✅ Yes | ⚠️ OK | ✅ Yes |
-| NPZ | 0.61 MB | ⚡ Very Fast | ❌ No | ✅ Excellent | ❌ Python only |
-| HDF5 | 0.70 MB | ⚡ Very Fast | ❌ No | ✅ Excellent | ✅ Yes |
 
 ## Interactive Visualization with Rerun
 
@@ -304,77 +296,6 @@ rr.save("analysis.rrd")
 rerun telemetry_recording.rrd
 ```
 
-## API Reference
-
-### Main Functions
-
-#### `gopropy.load(filepath: str) -> GoProTelemetry`
-
-Load telemetry from a GoPro MP4 file.
-
-**Parameters:**
-- `filepath`: Path to the GoPro MP4 file
-
-**Returns:** `GoProTelemetry` object
-
----
-
-### GoProTelemetry Class
-
-#### `list_streams() -> List[str]`
-
-Get list of all available stream names.
-
-#### `get_stream(name: str) -> Optional[SensorStream]`
-
-Get a specific sensor stream by name.
-
-**Parameters:**
-- `name`: Stream name (e.g., "Accelerometer", "GPS", etc.)
-
-**Returns:** `SensorStream` object or None
-
-#### `to_dataframe(streams: Optional[List[str]] = None) -> Dict[str, pd.DataFrame]`
-
-Convert telemetry to pandas DataFrames.
-
-**Parameters:**
-- `streams`: List of stream names to include (default: all)
-
-**Returns:** Dictionary mapping stream names to DataFrames
-
-#### `export_csv(output_dir: str, streams: Optional[List[str]] = None)`
-
-Export streams to CSV files (one file per stream).
-
-#### `export_json(output_path: str)`
-
-Export all streams to a single JSON file.
-
-#### `export_npz(output_path: str, streams: Optional[List[str]] = None)`
-
-Export to NumPy compressed format.
-
-#### `export_hdf5(output_path: str, streams: Optional[List[str]] = None)`
-
-Export to HDF5 format (requires h5py).
-
----
-
-### SensorStream Class
-
-#### Attributes
-
-- `name: str` - Stream name
-- `data: np.ndarray` - Sensor data (automatically scaled)
-- `timestamps: np.ndarray` - Timestamps in seconds
-- `units: Optional[str]` - Units (e.g., "m/s²", "rad/s")
-- `scale: Optional[float]` - Original scale factor
-
-#### `to_dataframe(set_index: bool = False) -> pd.DataFrame`
-
-Convert stream to pandas DataFrame.
-
 ---
 
 ### Visualization Module (Optional)
@@ -414,11 +335,6 @@ This library:
 3. **Decodes** sensor data with proper scaling and units
 4. **Provides** a clean Python API for accessing the data
 
-### Performance
-
-- Loads 105 telemetry packets with 21k+ samples in **~0.3 seconds**
-- Memory efficient - streams loaded on demand
-- Handles videos of any length
 
 ### Supported Cameras
 
@@ -461,15 +377,6 @@ The video file may not contain GPMF data. This can happen if:
 
 Some streams may have inconsistent data structures across packets. These streams are stored as object arrays and can still be accessed, but may need special handling.
 
-## Contributing
-
-Contributions are welcome! Areas for improvement:
-- Additional export formats
-- More visualization options
-- Better handling of edge cases
-- Support for more camera models
-- Performance optimizations
-
 ## License
 
 MIT License - see LICENSE file for details
@@ -479,22 +386,3 @@ MIT License - see LICENSE file for details
 - [GoPro GPMF Parser](https://github.com/gopro/gpmf-parser) - Official GPMF format documentation
 - [Rerun](https://rerun.io) - Visualization framework
 - Built with NumPy, Pandas, and ffmpeg
-
-## Related Projects
-
-- [gopro-telemetry](https://github.com/JuanIrache/gopro-telemetry) - JavaScript implementation
-- [gpmf-extract](https://github.com/stilldavid/gpmf-extract) - Ruby implementation
-- [gopro-dashboard-overlay](https://github.com/time4tea/gopro-dashboard-overlay) - Create dashboard overlays
-
-## Citation
-
-If you use this library in your research, please cite:
-
-```bibtex
-@software{gopropy,
-  title = {GoPro-Py: Python Library for GoPro Telemetry Extraction},
-  author = {Your Name},
-  year = {2025},
-  url = {https://github.com/yourusername/gopro-py}
-}
-```
