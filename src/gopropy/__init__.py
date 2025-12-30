@@ -16,6 +16,7 @@ from .models import (
     list_supported_models,
     detect_model_from_metadata,
 )
+from .exceptions import StreamNotFoundError
 
 __all__ = [
     "extract_gpmf_stream",
@@ -25,6 +26,7 @@ __all__ = [
     "get_model_config",
     "list_supported_models",
     "detect_model_from_metadata",
+    "StreamNotFoundError",
 ]
 
 

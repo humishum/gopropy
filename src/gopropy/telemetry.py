@@ -10,7 +10,7 @@ import logging
 from .extractor import extract_gpmf_stream
 from .parser import GPMFParser
 from .models import ModelConfig, get_model_config, detect_model_from_metadata
-
+from .exceptions import StreamNotFoundError
 logger = logging.getLogger(__name__)
 
 
@@ -355,8 +355,14 @@ class GoProTelemetry:
 
         Returns:
             SensorStream object or None if not found
+        Raises:
+            StreamNotFoundError: If the stream is not found
         """
-        return self.streams.get(name)
+        
+
+        if name not in self.streams:
+            raise StreamNotFoundError(f"Stream '{name}' does not exist in this telemetry file.")
+        return self.streams[name]
 
     def list_streams(self) -> List[str]:
         """Get list of all available stream names.
