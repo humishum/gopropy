@@ -76,6 +76,8 @@ HERO5_BLACK = ModelConfig(
         "ACCL": ["z", "x", "y"],
         "GYRO": ["z", "x", "y"],
         # GPS5 is not XYZ axes, it's: lat, lon, alt, 2D speed, 3D speed
+        "GPS5": ["lat", "lon", "alt", "speed_2d", "speed_3d"],
+        "WRGB": ["r", "g", "b"],
     },
     supported_fourccs={
         # Core metadata
@@ -176,6 +178,7 @@ HERO8_BLACK = ModelConfig(
         "CORI": ["w", "x", "y", "z"],  # Camera orientation quaternion
         "IORI": ["w", "x", "y", "z"],  # Image orientation quaternion
         "GRAV": ["x", "y", "z"],  # Gravity vector (standard x, y, z)
+        "AALP": ["rms", "peak"],  # Audio levels (RMS, peak)
     },
     added_fourccs={
         "CORI",  # Camera ORIentation (quaternion)
@@ -198,6 +201,17 @@ HERO9_BLACK = ModelConfig(
     inherits_from="HERO8_BLACK",
     axis_order={
         # Inherits all from Hero8
+        "GPS9": [
+            "lat",
+            "lon",
+            "alt",
+            "speed_2d",
+            "speed_3d",
+            "days",
+            "secs",
+            "dop",
+            "fix",
+        ],
     },
     added_fourccs={
         "GPS9",  # Enhanced GPS with 9 fields (vs GPS5 with 5 fields)
@@ -292,6 +306,20 @@ GENERIC = ModelConfig(
         "CORI": ["w", "x", "y", "z"],  # Quaternions are w-first (scalar-first)
         "IORI": ["w", "x", "y", "z"],  # Quaternions are w-first (scalar-first)
         "GRAV": ["x", "y", "z"],
+        "GPS5": ["lat", "lon", "alt", "speed_2d", "speed_3d"],
+        "GPS9": [
+            "lat",
+            "lon",
+            "alt",
+            "speed_2d",
+            "speed_3d",
+            "days",
+            "secs",
+            "dop",
+            "fix",
+        ],
+        "WRGB": ["r", "g", "b"],
+        "AALP": ["rms", "peak"],
     },
     supported_fourccs=HERO5_BLACK.supported_fourccs.copy(),
     notes="Fallback configuration for unknown models - uses standard axis ordering",

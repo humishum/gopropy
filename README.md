@@ -1,32 +1,21 @@
-# GoPro-Py
+# GoProPy
 
 **Python library for extracting and analyzing telemetry data from GoPro MP4 files.**
 
 GoPro cameras record rich sensor data (accelerometer, gyroscope, GPS, etc.) in their videos using the GPMF (GoPro Metadata Format). This library makes it easy to extract, process, and visualize that telemetry data in Python.
-
-## Features
-
-- 🎥 **Extract telemetry from GoPro videos** - Supports all GoPro cameras that record GPMF data
-- 📊 **Multiple sensor streams** - Accelerometer, gyroscope, GPS, camera settings, and more
-- 🐍 **Python-native** - Work with NumPy arrays and Pandas DataFrames
-- 💾 **Multiple export formats** - CSV, JSON, HDF5, NPZ
-- 📈 **Interactive visualization** - Optional Rerun integration for 3D visualization and time-series analysis
-- ⚡ **Fast and efficient** - Processes 100+ packets in under a second
-- 🎯 **Simple API** - Just `load()` and go
 
 ## Installation
 
 ### Basic Installation
 
 ```bash
+# MacOS
+brew install ffmpeg
+# Linux
+sudo apt install ffmpeg
+
 pip install gopropy
-```
 
-**Requirements:** Python ≥3.12, ffmpeg installed on your system
-
-### Optional Features
-
-```bash
 # For interactive visualization with Rerun
 pip install gopropy[visualization]
 
@@ -35,14 +24,6 @@ pip install h5py
 
 # Install everything
 pip install gopropy[all]
-```
-
-### Install from source
-
-```bash
-git clone https://github.com/yourusername/gopro-py.git
-cd gopro-py
-pip install -e .
 ```
 
 ## Quick Start
@@ -55,9 +36,8 @@ telemetry = gopropy.load("GOPR0001.MP4")
 
 # Access sensor streams
 accelerometer = telemetry.get_stream("Accelerometer")
-print(f"Shape: {accelerometer.data.shape}")  # (21047, 3) - 21k samples, 3 axes
-print(f"Units: {accelerometer.units}")        # m/s²
-print(f"Data:\n{accelerometer.data[:5]}")     # First 5 samples
+print(f"Shape: {accelerometer.data.shape}")  # (N, 3)
+print(f"Units: {accelerometer.units}")       # m/s²
 
 # Get all available streams
 print(f"Available streams: {telemetry.list_streams()}")
@@ -110,21 +90,6 @@ models = gopropy.list_supported_models()
 print(models)  # ['HERO5_BLACK', 'HERO5_SESSION', 'HERO6_BLACK', ...]
 ```
 
-### Axis Ordering
-
-**⚠️ Important:** GoPro cameras use non-standard axis ordering:
-
-**IMU Sensors (Hero5+):**
-- **Accelerometer (ACCL):** Z, X, Y order (not X, Y, Z)
-- **Gyroscope (GYRO):** Z, X, Y order (not X, Y, Z)
-
-**Orientation Sensors (Hero8+):**
-- **Camera Orientation (CORI):** W, X, Y, Z (quaternion, scalar-first)
-- **Image Orientation (IORI):** W, X, Y, Z (quaternion, scalar-first)
-- **Gravity Vector (GRAV):** X, Y, Z (standard)
-
-The Z, X, Y ordering for IMU sensors is documented in the [official GPMF parser](https://github.com/gopro/gpmf-parser) for Hero5. Quaternion ordering (w-first) was verified through data analysis. The library automatically handles this and labels axes correctly in DataFrames.
-
 ### Model-Specific Features
 
 Different GoPro models support different telemetry features:
@@ -171,77 +136,9 @@ print(df.head())
 # 1        0.0        12.465228        -2.486811        -4.196643
 ```
 
-### Working with GPS Data
-
-```python
-# Get GPS stream
-gps = telemetry.get_stream("GPS (Lat., Long., Alt., 2D speed, 3D speed)")
-
-if gps and gps.data.dtype != object:
-    # GPS data columns: [latitude, longitude, altitude, 2D_speed, 3D_speed]
-    latitudes = gps.data[:, 0]
-    longitudes = gps.data[:, 1]
-    altitudes = gps.data[:, 2]
-
-    print(f"GPS points: {len(latitudes)}")
-    print(f"Altitude range: {altitudes.min():.1f} - {altitudes.max():.1f} m")
-```
-
-### Export Formats
-
-#### CSV Export (Human-Readable)
-
-```python
-# Export all streams to separate CSV files
-telemetry.export_csv("output_directory/")
-# Creates: output_directory/Accelerometer.csv, Gyroscope.csv, etc.
-```
-
-**Best for:** Excel, spreadsheet software, human inspection
-
-#### JSON Export (Web-Friendly)
-
-```python
-# Export all streams to a single JSON file
-telemetry.export_json("telemetry.json")
-```
-
-**Best for:** Web applications, JavaScript integration
-
-#### NPZ Export (Compact Binary)
-
-```python
-# Export to NumPy compressed format
-telemetry.export_npz("telemetry.npz")
-
-# Load it back
-import numpy as np
-data = np.load("telemetry.npz")
-accel_data = data['Accelerometer_data']
-accel_timestamps = data['Accelerometer_timestamps']
-```
-
-**Best for:** Python workflows, fast loading, compact storage (7x smaller than CSV)
-
-#### HDF5 Export (Scientific Data)
-
-```python
-# Export to HDF5 format (requires h5py)
-telemetry.export_hdf5("telemetry.h5")
-
-# Load it back
-import h5py
-with h5py.File("telemetry.h5", 'r') as f:
-    accel = f['Accelerometer']
-    data = accel['data'][:]
-    timestamps = accel['timestamps'][:]
-    units = accel.attrs['units']
-```
-
-**Best for:** Large datasets, MATLAB/scientific computing, hierarchical data
 
 
-## Interactive Visualization with Rerun
+## Visualization with Rerun
 
 GoPro-Py includes optional integration with [Rerun](https://rerun.io) for interactive visualization of telemetry data.
 
@@ -263,39 +160,6 @@ telemetry = gopropy.load("GOPR0001.MP4")
 # Launch interactive viewer
 visualize(telemetry, video_path="GOPR0001.MP4")
 ```
-
-This opens the Rerun viewer with:
-- 📈 **Time-series plots** for all sensor streams
-- 🎯 **3D visualizations** (acceleration vectors, GPS path, orientation)
-- 🎬 **Synchronized video playback** (optional)
-- 🔍 **Interactive timeline** for scrubbing through time
-
-### Advanced Rerun Usage
-
-```python
-import rerun as rr
-from gopropy.visualization import to_rerun
-
-# Custom Rerun setup
-rr.init("my_gopro_analysis", spawn=True)
-
-# Log telemetry data
-to_rerun(telemetry, video_path="GOPR0001.MP4")
-
-# Add your own custom visualizations
-rr.log("analysis/max_accel", rr.Scalars([accel_magnitude.max()]))
-
-# Save recording
-rr.save("analysis.rrd")
-```
-
-### View Saved Recordings
-
-```bash
-# View a saved recording
-rerun telemetry_recording.rrd
-```
-
 ---
 
 ### Visualization Module (Optional)
@@ -308,41 +172,6 @@ Quick visualization with Rerun viewer.
 
 Log telemetry data to Rerun (requires `rr.init()` to be called first).
 
-## Examples
-
-Complete examples are available in the `examples/` directory:
-
-- **`basic_usage.py`** - Core functionality demonstration
-- **`export_formats.py`** - Export to CSV, JSON, HDF5, NPZ
-- **`visualize_rerun.py`** - Interactive visualization with Rerun
-
-```bash
-# Run examples
-python examples/basic_usage.py
-python examples/export_formats.py
-python examples/visualize_rerun.py
-```
-
-## Technical Details
-
-### GPMF Format
-
-GoPro uses the GPMF (GoPro Metadata Format) to store telemetry data in MP4 files. GPMF is a Key-Length-Value (KLV) structure designed for efficient storage of high-frequency sensor data.
-
-This library:
-1. **Extracts** the GPMF data stream from MP4 using ffmpeg
-2. **Parses** the binary KLV structure
-3. **Decodes** sensor data with proper scaling and units
-4. **Provides** a clean Python API for accessing the data
-
-
-### Supported Cameras
-
-All GoPro cameras that record GPMF metadata, including:
-- HERO 5 Black and newer
-- HERO (2018) and newer
-- MAX
-- Fusion
 
 ## Requirements
 
@@ -359,13 +188,6 @@ All GoPro cameras that record GPMF metadata, including:
 
 ## Troubleshooting
 
-### "ffmpeg not found"
-
-Install ffmpeg on your system:
-- **macOS:** `brew install ffmpeg`
-- **Ubuntu/Debian:** `sudo apt install ffmpeg`
-- **Windows:** Download from https://ffmpeg.org/download.html
-
 ### "No GPMF telemetry stream found"
 
 The video file may not contain GPMF data. This can happen if:
@@ -376,13 +198,3 @@ The video file may not contain GPMF data. This can happen if:
 ### "Could not convert ... to numeric array"
 
 Some streams may have inconsistent data structures across packets. These streams are stored as object arrays and can still be accessed, but may need special handling.
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Acknowledgments
-
-- [GoPro GPMF Parser](https://github.com/gopro/gpmf-parser) - Official GPMF format documentation
-- [Rerun](https://rerun.io) - Visualization framework
-- Built with NumPy, Pandas, and ffmpeg

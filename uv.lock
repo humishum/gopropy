@@ -410,6 +410,7 @@ dependencies = [
     { name = "ffmpeg-python" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "pytest" },
     { name = "ruff" },
 ]
 
@@ -449,6 +450,7 @@ requires-dist = [
     { name = "opencv-python", marker = "extra == 'all'", specifier = ">=4.8.0" },
     { name = "opencv-python", marker = "extra == 'visualization'", specifier = ">=4.8.0" },
     { name = "pandas", specifier = ">=2.0.0" },
+    { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "rerun-sdk", marker = "extra == 'all'", specifier = ">=0.15.0" },

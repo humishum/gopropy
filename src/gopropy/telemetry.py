@@ -73,15 +73,32 @@ class SensorStream:
                         f"No model-specific axis order for {fourcc}, using default: {axis_names}"
                     )
 
+            if len(axis_names) < num_axes:
+                # Ensure we never drop columns when axis labels are incomplete.
+                axis_names += [
+                    f"axis_{i + 1}" for i in range(len(axis_names), num_axes)
+                ]
+
             # Build DataFrame with explicit column order to preserve axis ordering
-            # Use a dict comprehension to maintain order, then select columns explicitly
+            # Use axis-only labels when model config defines them; fall back to name+axis.
+            use_axis_only = (
+                model_config is not None
+                and fourcc is not None
+                and fourcc in model_config.axis_order
+            )
+
             data_dict = {"timestamp": self.timestamps}
             column_names = ["timestamp"]
+            seen_names = {"timestamp"}
 
             for i, axis in enumerate(axis_names):
-                col_name = f"{self.name}_{axis}"
+                if use_axis_only and axis not in seen_names:
+                    col_name = axis
+                else:
+                    col_name = f"{self.name}_{axis}"
                 data_dict[col_name] = self.data[:, i]
                 column_names.append(col_name)
+                seen_names.add(col_name)
 
             # Create DataFrame and explicitly reorder columns to match axis_names order
             df = pd.DataFrame(data_dict)
@@ -232,6 +249,11 @@ class GoProTelemetry:
         flat_data = []
         flat_timestamps = []
 
+        fourcc = stream_info.get("fourcc")
+        axis_order_len = None
+        if self.model_config and fourcc in self.model_config.axis_order:
+            axis_order_len = len(self.model_config.axis_order[fourcc])
+
         for ts, item in zip(timestamp_list, data_list):
             # Skip non-numeric data (strings, bytes, etc.)
             if isinstance(item, (str, bytes)):
@@ -253,8 +275,11 @@ class GoProTelemetry:
                         # Could be either:
                         # - Multiple scalar samples: [v1, v2, v3, ...]
                         # - Single multi-axis sample: (z, x, y)
-                        # Heuristic: if length <= 4, assume single multi-axis sample
-                        if len(item) <= 4:
+                        # Heuristic: if length <= 4 or matches a known axis order,
+                        # assume single multi-axis sample.
+                        if len(item) <= 4 or (
+                            axis_order_len is not None and len(item) == axis_order_len
+                        ):
                             # Single multi-axis sample
                             flat_data.append(item)
                             flat_timestamps.append(ts)
